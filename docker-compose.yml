@@ -1,0 +1,6 @@
+version: '3'
+services:
+  keep2todoist:
+    container_name: keep2todoist
+    build: app
+    restart: always

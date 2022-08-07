@@ -19,13 +19,18 @@ update_interval_s: 60
 google_username: yourUsername
 google_password: canBeAnAppPassword
 todoist_api_token: todoistApiKey
-keep_lists:
+keep_lists:  # list your keep lists on this level
   - Todo:
-    due_str_en: today
+    due_str_en: today # optional: you can set a due date in english here
   - 'Shopping'
-    todoist_project: 'Shopping'
+    todoist_project: 'Shopping' # optional: you can choose a project for todoist here
 ```
+
+It is recommended that you don't use your google main credentials. 
+Instead go to https://myaccount.google.com/apppasswords and generate an app password specifically for this tool.
+
+Your todoist token can be found in todoist settings->integrations.
 
 ## Start
 
-Either use docker/docker-compose to start the service or go to the app folder and run the code directly.
+Either use docker/docker-compose to start the service or go to the app folder, install requirements and run the code directly.

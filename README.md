@@ -22,7 +22,8 @@ todoist_api_token: todoistApiKey
 keep_lists:  # list your keep lists on this level
   - Todo:
     due_str_en: today # optional: you can set a due date in english here
-  - 'Shopping'
+    # if todoist_project is not set your task will go into the todoist inbox
+  - Shopping:
     todoist_project: 'Shopping' # optional: you can choose a project for todoist here
 ```
 

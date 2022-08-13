@@ -10,6 +10,8 @@ My use case is having an intuitive google assistant integration for todoist:
 It is not a real sync but just a **one way** keep->todoist.
 Moved items will be deleted from keep's list.
 
+This works also with archived google keep lists (in case you don't want your intermediate lists to distract you if you're actually using google keep).
+
 ## Configuration
 
 Create a `config.yaml` from `config.example.yaml`:

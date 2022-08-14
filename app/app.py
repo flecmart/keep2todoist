@@ -1,21 +1,16 @@
-import yaml
 import logging
 import schedule
 import time
 import gkeepapi
+import sys
 from todoist_api_python.api import TodoistAPI
+from config import Config
+from fileModifiedHandler import FileModifiedHandler
 
-def load_configuration():
-    try:
-        with open('config.yaml', 'r') as yamlfile:
-            config = yaml.safe_load(yamlfile)
-    except Exception as ex:
-        logging.error(f'Could not load configuration: {ex}')
-    return config
-
+log = logging.getLogger(__name__)
 
 def get_todoist_project_id(api, name):
-    for project in todoist_api.get_projects():
+    for project in api.get_projects():
         if project.name == name:
             return project.id
     return None
@@ -35,31 +30,34 @@ def transfer_list(keep_list_name: str, todoist_project: str, due: str):
             else:
                 todoist_api.add_task(content=item.text, due_string=due, due_lang='en')
             
-            logging.info(f'\t-> {item.text}')
+            log.info(f'\t-> {item.text}')
             item.delete()
-    
+    keep.sync()
+
     
 def update():
-    for keep_list in config['keep_lists']:
+    if Config.needs_update():
+        Config.update_configuration()
+    for keep_list in Config.config['keep_lists']:
         keep_list_name = list(keep_list.keys())[0]
-        logging.info(f'Transfering {keep_list_name} list from keep to todoist...')
+        log.info(f'Transfering {keep_list_name} list from keep to todoist...')
         transfer_list(keep_list_name, parse_key(keep_list, 'todoist_project'), parse_key(keep_list, 'due_str_en'))
 
 
 if __name__ == '__main__':
-    logging.getLogger().setLevel(logging.INFO)
-    logging.info('Loading configuration...')
-    config = load_configuration()
-
+    logging.basicConfig(stream=sys.stdout, level=logging.INFO)
+    log.info('Loading configuration...')
+    Config('config.yaml')
+    
     keep = gkeepapi.Keep()
-    keep.login(config['google_username'], config['google_password'])
+    keep.login(Config.config['google_username'], Config.config['google_password'])
     
-    todoist_api = TodoistAPI(config['todoist_api_token'])
+    todoist_api = TodoistAPI(Config.config['todoist_api_token'])
     
-    update_interval_s = config['update_interval_s']
+    update_interval_s = Config.config['update_interval_s']
     schedule.every(update_interval_s).seconds.do(update)
     
-    logging.info('Start scheduler...')
+    log.info('Start scheduler...')
     schedule.run_all()
     
     while True:

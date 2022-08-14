@@ -1,10 +1,11 @@
 import logging
 import yaml
 import os
+import sys
 
 log = logging.getLogger(__name__)
 
-class Config():
+class ConfigManager():
     def __init__(self, path_to_config):
         """Initialize config.
 
@@ -21,9 +22,15 @@ class Config():
         """Check if config changed
 
         Returns:
-            bool: _description_
+            bool: return True if config change detected
         """
-        return os.stat(self.path_to_config).st_mtime != self._cached_st_mtime
+        needs_update = False
+        st_mtime = os.stat(self.path_to_config).st_mtime
+        if st_mtime != self._cached_st_mtime:
+            log.info('config change detected')
+            self._cached_st_mtime = st_mtime
+            needs_update = True
+        return needs_update
              
     
     def update_configuration(self):
@@ -32,11 +39,9 @@ class Config():
         try:
             with open(self.path_to_config, 'r') as yamlfile:
                 self._config = yaml.safe_load(yamlfile)
-                # TODO: don't expose secrets
-                log.info(f'updated config: {self.config}')
+                log.info(f'updated config')
         except Exception as ex:
-            log.error(f'Could not load configuration: {ex}')
-            
+            log.error(f'could not load configuration: {ex}')
             
     @property
     def config(self):

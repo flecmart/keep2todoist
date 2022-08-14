@@ -4,9 +4,9 @@ import time
 import gkeepapi
 import sys
 from todoist_api_python.api import TodoistAPI
-from config import Config
+from configManager import ConfigManager
 
-log = logging.getLogger(__name__)
+log = logging.getLogger('app')
 
 def get_todoist_project_id(api, name):
     for project in api.get_projects():
@@ -35,28 +35,30 @@ def transfer_list(keep_list_name: str, todoist_project: str, due: str):
 
     
 def update():
-    if config.needs_update():
-        config.update_configuration()
-    for keep_list in config['keep_lists']:
+    if configManager.needs_update():
+        configManager.update_configuration()
+    for keep_list in configManager.config['keep_lists']:
         keep_list_name = list(keep_list.keys())[0]
-        log.info(f'Transfering {keep_list_name} list from keep to todoist...')
+        log.info(f'transfering {keep_list_name} list from keep to todoist')
         transfer_list(keep_list_name, parse_key(keep_list, 'todoist_project'), parse_key(keep_list, 'due_str_en'))
 
 
 if __name__ == '__main__':
-    logging.basicConfig(stream=sys.stdout, level=logging.INFO)
-    log.info('Loading configuration...')
-    config = Config('config.yaml')
+    logging.basicConfig(stream=sys.stdout,
+                        level=logging.INFO,
+                        format='%(asctime)s %(name)s-%(levelname)s: %(message)s',
+                        datefmt='%Y-%m-%d %H:%M:%S')
+    configManager = ConfigManager('config.yaml')
     
     keep = gkeepapi.Keep()
-    keep.login(config['google_username'], config['google_password'])
+    keep.login(configManager.config['google_username'], configManager.config['google_password'])
     
-    todoist_api = TodoistAPI(config['todoist_api_token'])
+    todoist_api = TodoistAPI(configManager.config['todoist_api_token'])
     
-    update_interval_s = config['update_interval_s']
+    update_interval_s = configManager.config['update_interval_s']
     schedule.every(update_interval_s).seconds.do(update)
     
-    log.info('Start scheduler...')
+    log.info('start scheduler')
     schedule.run_all()
     
     while True:

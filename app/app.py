@@ -35,9 +35,9 @@ def transfer_list(keep_list_name: str, todoist_project: str, due: str):
 
     
 def update():
-    if Config.needs_update():
-        Config.update_configuration()
-    for keep_list in Config.config['keep_lists']:
+    if config.needs_update():
+        config.update_configuration()
+    for keep_list in config['keep_lists']:
         keep_list_name = list(keep_list.keys())[0]
         log.info(f'Transfering {keep_list_name} list from keep to todoist...')
         transfer_list(keep_list_name, parse_key(keep_list, 'todoist_project'), parse_key(keep_list, 'due_str_en'))
@@ -46,14 +46,14 @@ def update():
 if __name__ == '__main__':
     logging.basicConfig(stream=sys.stdout, level=logging.INFO)
     log.info('Loading configuration...')
-    Config('config.yaml')
+    config = Config('config.yaml')
     
     keep = gkeepapi.Keep()
-    keep.login(Config.config['google_username'], Config.config['google_password'])
+    keep.login(config['google_username'], config['google_password'])
     
-    todoist_api = TodoistAPI(Config.config['todoist_api_token'])
+    todoist_api = TodoistAPI(config['todoist_api_token'])
     
-    update_interval_s = Config.config['update_interval_s']
+    update_interval_s = config['update_interval_s']
     schedule.every(update_interval_s).seconds.do(update)
     
     log.info('Start scheduler...')

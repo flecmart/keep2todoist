@@ -4,3 +4,7 @@ services:
     container_name: keep2todoist
     build: app
     restart: always
+    volumes:
+      - type: bind
+        source: ./app/config.yaml
+        target: /app/config.yaml

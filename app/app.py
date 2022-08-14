@@ -5,7 +5,6 @@ import gkeepapi
 import sys
 from todoist_api_python.api import TodoistAPI
 from config import Config
-from fileModifiedHandler import FileModifiedHandler
 
 log = logging.getLogger(__name__)
 

@@ -27,13 +27,28 @@ keep_lists:  # list your keep lists on this level
     # if todoist_project is not set your task will go into the todoist inbox
   - Shopping:
     todoist_project: 'Shopping' # optional: you can choose a project for todoist here
+  - Test: #entry without optional attribtues - notice the colon!
 ```
 
-It is recommended that you don't use your google main credentials. 
-Instead go to https://myaccount.google.com/apppasswords and generate an app password specifically for this tool.
-
-Your todoist token can be found in todoist settings->integrations.
+- It is recommended that you don't use your google main credentials.
+Instead go to https://myaccount.google.com/apppasswords and generate an app password specifically for this tool
+- Your todoist token can be found in todoist settings->integrations
+- Changes of `config.yaml` will be detected automatically and the updated config will be reflected if the yaml is valid
 
 ## Start
 
-Either use docker/docker-compose to start the service or go to the app folder, install requirements and run the code directly.
+Either use docker/docker-compose to start the service:
+
+```bash
+docker-compose up -d
+```
+
+or go to the app folder, install requirements and run the code directly:
+
+```bash
+cd app
+pip install -r requirements.txt
+python3 app.py
+```
+
+docker-compose has the advantage that the service will be restarted automatically on reboot or error.

@@ -40,10 +40,10 @@ def get_labels_from_todoist(api: TodoistAPI):
 
 
 def create_todoist_labels_if_necessary(labels: list, api: TodoistAPI):
-    """Compare yaml labels to labels from todoist api and create new labels if necessary. 
+    """Compare keep labels to labels from todoist api and create new labels if necessary. 
 
     Args:
-        labels (list): list of labels from yaml
+        labels (list): list of labels
         api (TodoistAPI): api
 
     Returns:
@@ -66,13 +66,35 @@ def create_todoist_labels_if_necessary(labels: list, api: TodoistAPI):
     return label_ids
 
 
+def get_labels_on_gkeep_list(gkeep_list, gkeeplabels):
+    """Get all labels on a gkeep list.
+
+    Args:
+        gkeep_list (keepapi.node.List): Google keep list from gkeepapi
+        gkeeplabels (list): List of gkeepapi.node.Label
+
+    Returns:
+        list: List of label names or None
+    """
+    labels_on_list = []
+    for label in gkeeplabels:
+        if gkeep_list.labels.get(label.id) != None:
+            labels_on_list.append(label.name)
+    if len(labels_on_list) == 0:
+        return None
+    log.info(f'list_labels on {gkeep_list.title}: {labels_on_list}')
+    return labels_on_list
+    
+
 def parse_key(keep_list: dict, key: str):
     return keep_list[key] if key in keep_list else None
     
 
-def transfer_list(keep_list_name: str, todoist_project: str, due: str, labels: list):
+def transfer_list(keep_list_name: str, todoist_project: str, due: str):
     keep.sync()
+    all_labels = keep.labels()
     for keep_list in (keep.find(func=lambda x: x.title == keep_list_name)):
+        labels = get_labels_on_gkeep_list(keep_list, all_labels)
         for item in keep_list.items:
             label_ids = []
             if labels:
@@ -94,7 +116,7 @@ def update():
     for keep_list in configManager.config['keep_lists']:
         keep_list_name = list(keep_list.keys())[0]
         log.info(f'transfering {keep_list_name} list from keep to todoist')
-        transfer_list(keep_list_name, parse_key(keep_list, 'todoist_project'), parse_key(keep_list, 'due_str_en'), parse_key(keep_list, 'labels'))
+        transfer_list(keep_list_name, parse_key(keep_list, 'todoist_project'), parse_key(keep_list, 'due_str_en'))
 
 
 if __name__ == '__main__':

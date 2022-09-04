@@ -9,7 +9,3 @@ keep_lists:  # list your keep lists on this level
   - Shopping:
     todoist_project: 'Shopping' # optional: you can choose a project for todoist here
   - Test: #entry without optional attribtues - notice the colon!
-  - Test Labels:
-    labels:
-      - keep2todoist
-      - Synced

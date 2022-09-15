@@ -1,4 +1,5 @@
 gkeepapi~=0.14.2
 todoist-api-python~=2.0.0
 pyyaml~=6.0
+yamale~=4.0.4
 schedule~=1.1.0

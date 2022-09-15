@@ -1,9 +1,10 @@
 import logging
 import yaml
 import os
-import sys
+import yamale
 
 log = logging.getLogger(__name__)
+SCHEMA = './config.schema.yaml'
 
 class ConfigManager():
     def __init__(self, path_to_config):
@@ -13,6 +14,7 @@ class ConfigManager():
             path_to_config (str): path to config.yaml
         """
         self.path_to_config = path_to_config
+        self.schema = yamale.make_schema(SCHEMA)
         self._cached_st_mtime = 0
         self._config = dict()
         self.update_configuration()
@@ -39,9 +41,26 @@ class ConfigManager():
         try:
             with open(self.path_to_config, 'r') as yamlfile:
                 self._config = yaml.safe_load(yamlfile)
-                log.info(f'updated config')
+                log.info(f'updated config: {self.path_to_config}')
         except Exception as ex:
-            log.error(f'could not load configuration: {ex}')
+            log.error(f"could not load configuration '{ex}'")
+        self.validate_configuration()
+            
+    def validate_configuration(self):
+        """Validate config.yaml
+        """
+        data = yamale.make_data(self.path_to_config)
+        try:
+            log.info(f"validating configuration with schema '{SCHEMA}'")
+            yamale.validate(self.schema, data)
+            log.info('validation passed 👍')
+        except yamale.YamaleError as ex:
+            log.error('validation failed!')
+            for result in ex.results:
+                log.error(f"Error validating data '{result.data}' with '{result.schema}'")
+                for error in result.errors:
+                    log.error(f" -> {error}")
+            exit(1)
             
     @property
     def config(self):

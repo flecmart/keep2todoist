@@ -38,13 +38,14 @@ class ConfigManager():
     def update_configuration(self):
         """Reload config.yaml
         """
+        self.validate_configuration()
         try:
             with open(self.path_to_config, 'r') as yamlfile:
                 self._config = yaml.safe_load(yamlfile)
                 log.info(f'updated config: {self.path_to_config}')
         except Exception as ex:
             log.error(f"could not load configuration '{ex}'")
-        self.validate_configuration()
+        
             
     def validate_configuration(self):
         """Validate config.yaml

@@ -8,7 +8,9 @@ My use case is having an intuitive google assistant integration for todoist:
 2. Let this tool move items from google keep lists to todoist lists.
 
 It is not a real sync but just a **one way** keep->todoist.
-Moved items will be deleted from keep's list.
+
+- Moved items will be deleted from keep's list
+- Labels on google keep lists will be attached to their corresponding todo tasks
 
 This works also with archived google keep lists (in case you don't want your intermediate lists to distract you if you're actually using google keep).
 
@@ -23,11 +25,14 @@ google_password: canBeAnAppPassword
 todoist_api_token: todoistApiKey
 keep_lists:  # list your keep lists on this level
   - Todo:
-    due_str_en: today # optional: you can set a due date in english here
-    # if todoist_project is not set your task will go into the todoist inbox
+      sync_labels: false # required: transfer labels from gkeep lists to todoist items
+      due_str_en: 'today' # optional: you can set a due date in english here
+      # if todoist_project is not set your task will go into the todoist inbox
   - Shopping:
-    todoist_project: 'Shopping' # optional: you can choose a project for todoist here
-  - Test: #entry without optional attribtues - notice the colon!
+      sync_labels: false
+      todoist_project: 'Shopping' # optional: you can choose a project for todoist here
+  - Test:
+      sync_labels: false
 ```
 
 - It is recommended that you don't use your google main credentials.

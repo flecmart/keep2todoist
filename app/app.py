@@ -31,7 +31,7 @@ def get_labels_from_todoist(api: TodoistAPI):
         api (TodoistAPI): api
 
     Returns:
-        _type_: TODO
+        list<Label>: list of todoist labels
     """
     try:
         return api.get_labels()
@@ -90,11 +90,11 @@ def parse_key(keep_list: dict, key: str):
     return keep_list[key] if key in keep_list else None
     
 
-def transfer_list(keep_list_name: str, todoist_project: str, due: str):
+def transfer_list(keep_list_name: str, todoist_project: str, due: str, sync_labels: bool):
     keep.sync()
-    all_labels = keep.labels()
+    all_labels = keep.labels() if sync_labels else None
     for keep_list in (keep.find(func=lambda x: x.title == keep_list_name)):
-        labels = get_labels_on_gkeep_list(keep_list, all_labels)
+        labels = get_labels_on_gkeep_list(keep_list, all_labels) if sync_labels else None
         for item in keep_list.items:
             label_ids = []
             if labels:
@@ -115,8 +115,12 @@ def update():
         configManager.update_configuration()
     for keep_list in configManager.config['keep_lists']:
         keep_list_name = list(keep_list.keys())[0]
+        keep_list_options = list(keep_list.values())[0]
         log.info(f'transfering {keep_list_name} list from keep to todoist')
-        transfer_list(keep_list_name, parse_key(keep_list, 'todoist_project'), parse_key(keep_list, 'due_str_en'))
+        transfer_list(keep_list_name, 
+                      parse_key(keep_list_options, 'todoist_project'), 
+                      parse_key(keep_list_options, 'due_str_en'), 
+                      parse_key(keep_list_options, 'sync_labels'))
 
 
 if __name__ == '__main__':

@@ -25,11 +25,14 @@ google_password: canBeAnAppPassword
 todoist_api_token: todoistApiKey
 keep_lists:  # list your keep lists on this level
   - Todo:
-    due_str_en: today # optional: you can set a due date in english here
-    # if todoist_project is not set your task will go into the todoist inbox
+      sync_labels: false # required: transfer labels from gkeep lists to todoist items
+      due_str_en: 'today' # optional: you can set a due date in english here
+      # if todoist_project is not set your task will go into the todoist inbox
   - Shopping:
-    todoist_project: 'Shopping' # optional: you can choose a project for todoist here
-  - Test: #entry without optional attribtues - notice the colon!
+      sync_labels: false
+      todoist_project: 'Shopping' # optional: you can choose a project for todoist here
+  - Test:
+      sync_labels: false
 ```
 
 - It is recommended that you don't use your google main credentials.

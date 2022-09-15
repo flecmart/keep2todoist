@@ -47,23 +47,23 @@ def create_todoist_labels_if_necessary(labels: list, api: TodoistAPI):
         api (TodoistAPI): api
 
     Returns:
-        list<int>: list of corresponding todoist label ids 
+        list<str>: list of corresponding todoist labels
     """
-    label_ids = []
+    labels_for_task = []
     todoist_labels = get_labels_from_todoist(api)
     for i, label in enumerate(labels):
         for todoist_label in todoist_labels:
             if label == todoist_label.name:
                 log.debug(f'found todoist label {label} with id {todoist_label.id}')
-                label_ids.append(todoist_label.id)
-        if len(label_ids) <= i:
+                labels_for_task.append(todoist_label.name)
+        if len(labels_for_task) <= i:
             try:
                 new_label = api.add_label(name=label)
                 log.debug(f'created todoist label {label} with id {new_label.id}')
-                label_ids.append(new_label.id)
+                labels_for_task.append(new_label.name)
             except Exception as ex:
                 log.exception(ex)
-    return label_ids
+    return labels_for_task
 
 
 def get_labels_on_gkeep_list(gkeep_list, gkeeplabels):
@@ -96,14 +96,14 @@ def transfer_list(keep_list_name: str, todoist_project: str, due: str, sync_labe
     for keep_list in (keep.find(func=lambda x: x.title == keep_list_name)):
         labels = get_labels_on_gkeep_list(keep_list, all_labels) if sync_labels else None
         for item in keep_list.items:
-            label_ids = []
+            todoist_labels = []
             if labels:
-                label_ids = create_todoist_labels_if_necessary(labels, todoist_api)
+                todoist_labels = create_todoist_labels_if_necessary(labels, todoist_api)
             if todoist_project:
                 todoist_project_id = get_todoist_project_id(todoist_api, todoist_project)
-                todoist_api.add_task(content=item.text, project_id=todoist_project_id, due_string=due, due_lang='en', label_ids=label_ids)
+                todoist_api.add_task(content=item.text, project_id=todoist_project_id, due_string=due, due_lang='en', labels=todoist_labels)
             else:
-                todoist_api.add_task(content=item.text, due_string=due, due_lang='en', label_ids=label_ids)
+                todoist_api.add_task(content=item.text, due_string=due, due_lang='en', labels=todoist_labels)
             
             log.info(f'\t-> {item.text}')
             item.delete()

@@ -23,6 +23,9 @@ update_interval_s: 60
 google_username: yourUsername
 google_password: canBeAnAppPassword
 todoist_api_token: todoistApiKey
+healthcheck: # optional: configure some kind of healtcheck endpoint providing service monitoring, e.g. https://healthchecks.io/
+  url: https://hc-ping.com/someuuid
+  period_min: 30
 keep_lists:  # list your keep lists on this level
   - Todo:
       sync_labels: false # required: transfer labels from gkeep lists to todoist items

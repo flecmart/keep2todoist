@@ -12,6 +12,20 @@ log = logging.getLogger('app')
 def restart():
     log.info('restarting...')
     os.execv(sys.executable, ['python'] + sys.argv)
+    
+
+def ping_healthcheck(healtcheck_url: str):
+    """Ping some kind of healthcheck url providing a possibility to monitor this service.
+    """
+    import socket
+    import urllib.request
+    
+    try:
+        log.info(f'ping {healtcheck_url}')
+        urllib.request.urlopen(healtcheck_url, timeout=10)
+    except socket.error as ex:
+        log.warning(f'failed to ping {healtcheck_url}: {ex}')
+
 
 def get_todoist_project_id(api: TodoistAPI, name):
     """Get todoist project id by name.
@@ -143,6 +157,12 @@ if __name__ == '__main__':
     
     update_interval_s = configManager.config['update_interval_s']
     schedule.every(update_interval_s).seconds.do(update)
+    
+    if 'healthcheck' in configManager.config.keys():
+        healthcheck_url = configManager.config['healthcheck']['url']
+        healtheck_period_min = configManager.config['healthcheck']['period_min']
+        ping_healthcheck(healthcheck_url)
+        schedule.every(healtheck_period_min).minutes.do(ping_healthcheck, healthcheck_url=healthcheck_url)
     
     log.info('start scheduler')
     update()

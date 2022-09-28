@@ -2,6 +2,7 @@ update_interval_s: int(min=1, required=True)
 google_username: str(required=True)
 google_password: str(required=True)
 todoist_api_token: str(required=True)
+healthcheck: include('healthcheck_attributes', required=False)
 keep_lists: list(include('list_mapping'))
 ---
 list_mapping: map(include('list_mapping_attributes'))
@@ -10,3 +11,7 @@ list_mapping_attributes:
   sync_labels: bool(required=True)
   due_str_en: str(required=False)
   todoist_project: str(required=False)
+---
+healthcheck_attributes:
+  url: str(required=True)
+  period_min: int(required=True)

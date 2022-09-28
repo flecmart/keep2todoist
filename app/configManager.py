@@ -15,7 +15,7 @@ class ConfigManager():
         """
         self.path_to_config = path_to_config
         self.schema = yamale.make_schema(SCHEMA)
-        self._cached_st_mtime = 0
+        self._cached_st_mtime = os.stat(path_to_config).st_mtime
         self._config = dict()
         self.update_configuration()
         

@@ -35,10 +35,9 @@ keep_lists:  # list your keep lists on this level
       sync_labels: false
 ```
 
-- It is recommended that you don't use your google main credentials.
-Instead go to https://myaccount.google.com/apppasswords and generate an app password specifically for this tool
-- Your todoist token can be found in todoist settings->integrations
-- Changes of `config.yaml` will be detected automatically and the updated config will be reflected if the yaml is valid
+- It is recommended that you don't use your google main credentials. Instead go to https://myaccount.google.com/apppasswords and generate an app password specifically for this tool.
+- Your todoist token can be found in todoist settings->integrations.
+- Changes in `config.yaml` will be detected automatically and the updated config will be reflected if the yaml is valid.
 
 ## Start
 

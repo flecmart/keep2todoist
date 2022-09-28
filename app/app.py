@@ -139,7 +139,7 @@ if __name__ == '__main__':
     schedule.every(update_interval_s).seconds.do(update)
     
     log.info('start scheduler')
-    schedule.run_all()
+    update()
     
     while True:
         schedule.run_pending()

@@ -41,6 +41,11 @@ keep_lists:  # list your keep lists on this level
 - It is recommended that you don't use your google main credentials. Instead go to https://myaccount.google.com/apppasswords and generate an app password specifically for this tool.
 - Your todoist token can be found in todoist settings->integrations.
 - Changes in `config.yaml` will be detected automatically and the updated config will be reflected if the yaml is valid.
+- optionally, for setting up a healthcheck to ensure that your service is running you can use a service like https://healthchecks.io/:
+
+![image](https://user-images.githubusercontent.com/10167243/192765584-80b1866d-7483-4693-9912-5fa769cbe0c4.png)
+
+If configured it will provide you with an url and the app will ping this url every 'period_min' minutes. On the healtcheck's service side you configure a matching period & grace time. You can then get notified if a ping is missed, e.g. via mail.
 
 ## Start
 

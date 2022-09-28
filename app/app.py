@@ -3,10 +3,15 @@ import schedule
 import time
 import gkeepapi
 import sys
+import os
 from todoist_api_python.api import TodoistAPI
 from configManager import ConfigManager
 
 log = logging.getLogger('app')
+
+def restart():
+    log.info('restarting...')
+    os.execv(sys.executable, ['python'] + sys.argv)
 
 def get_todoist_project_id(api: TodoistAPI, name):
     """Get todoist project id by name.
@@ -113,6 +118,7 @@ def transfer_list(keep_list_name: str, todoist_project: str, due: str, sync_labe
 def update():
     if configManager.needs_update():
         configManager.update_configuration()
+        restart()
     for keep_list in configManager.config['keep_lists']:
         keep_list_name = list(keep_list.keys())[0]
         keep_list_options = list(keep_list.values())[0]

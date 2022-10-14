@@ -14,17 +14,17 @@ def restart():
     os.execv(sys.executable, ['python'] + sys.argv)
     
 
-def ping_healthcheck(healtcheck_url: str):
+def ping_healthcheck(healthcheck_url: str):
     """Ping some kind of healthcheck url providing a possibility to monitor this service.
     """
     import socket
     import urllib.request
     
     try:
-        log.info(f'ping {healtcheck_url}')
-        urllib.request.urlopen(healtcheck_url, timeout=10)
+        log.info(f'ping {healthcheck_url}')
+        urllib.request.urlopen(healthcheck_url, timeout=10)
     except socket.error as ex:
-        log.warning(f'failed to ping {healtcheck_url}: {ex}')
+        log.warning(f'failed to ping {healthcheck_url}: {ex}')
 
 
 def get_todoist_project_id(api: TodoistAPI, name):

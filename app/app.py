@@ -151,7 +151,7 @@ if __name__ == '__main__':
     configManager = ConfigManager('config.yaml')
     
     keep = gkeepapi.Keep()
-    keep.login(configManager.config['google_username'], configManager.config['google_password'], device_id="keep2todoist")
+    keep.login(configManager.config['google_username'], configManager.config['google_password'], device_id='3ee9002270d00157')
     
     todoist_api = TodoistAPI(configManager.config['todoist_api_token'])
     

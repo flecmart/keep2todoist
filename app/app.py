@@ -108,8 +108,13 @@ def get_labels_on_gkeep_list(gkeep_list, gkeeplabels):
 def parse_key(keep_list: dict, key: str):
     return keep_list[key] if key in keep_list else None
 
+def get_assignee(api: TodoistAPI, project_id: str, email: str):
+    for collaborator in api.get_collaborators(project_id):
+        if collaborator.email == email:
+            return collaborator.id
+    return None
 
-def transfer_list(keep_list_name: str, todoist_project: str, due: str, sync_labels: bool, assignee_id: str):
+def transfer_list(keep_list_name: str, todoist_project: str, due: str, sync_labels: bool, assignee_email: str):
     keep.sync()
     all_labels = keep.labels() if sync_labels else None
     for keep_list in (keep.find(func=lambda x: x.title == keep_list_name)):
@@ -120,9 +125,10 @@ def transfer_list(keep_list_name: str, todoist_project: str, due: str, sync_labe
                 todoist_labels = create_todoist_labels_if_necessary(labels, todoist_api)
             if todoist_project:
                 todoist_project_id = get_todoist_project_id(todoist_api, todoist_project)
-                todoist_api.add_task(content=item.text, project_id=todoist_project_id, due_string=due, due_lang='en', labels=todoist_labels, assignee_id=assignee_id)
+                assignee = get_assignee(todoist_api, todoist_project_id, assignee_email)
+                todoist_api.add_task(content=item.text, project_id=todoist_project_id, due_string=due, due_lang='en', labels=todoist_labels, assignee_id=assignee)
             else:
-                todoist_api.add_task(content=item.text, due_string=due, due_lang='en', labels=todoist_labels, assignee_id=assignee_id)
+                todoist_api.add_task(content=item.text, due_string=due, due_lang='en', labels=todoist_labels)
 
             log.info(f'\t-> {item.text}')
             item.delete()
@@ -141,7 +147,7 @@ def update():
                       parse_key(keep_list_options, 'todoist_project'),
                       parse_key(keep_list_options, 'due_str_en'),
                       parse_key(keep_list_options, 'sync_labels'),
-                      parse_key(keep_list_options, 'assignee_id'))
+                      parse_key(keep_list_options, 'assignee_email'))
 
 
 if __name__ == '__main__':

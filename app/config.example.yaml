@@ -9,7 +9,7 @@ keep_lists:  # list your keep lists on this level
   - Todo:
       sync_labels: false # required: transfer labels from gkeep lists to todoist items
       due_str_en: 'today' # optional: you can set a due date in english here
-      assignee_email: 'name@domain.tld' # optional: the email of the person to be assigned
+      assignee_email: 'name@domain.tld' # optional: the email of the person to be assigned, requires todoist_project to be a shared project.
       # if todoist_project is not set your task will go into the todoist inbox
   - Shopping:
       sync_labels: false

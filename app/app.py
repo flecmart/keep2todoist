@@ -109,9 +109,10 @@ def parse_key(keep_list: dict, key: str):
     return keep_list[key] if key in keep_list else None
 
 def get_assignee(api: TodoistAPI, project_id: str, email: str):
-    for collaborator in api.get_collaborators(project_id):
-        if collaborator.email == email:
-            return collaborator.id
+    if project_id and email:
+        for collaborator in api.get_collaborators(project_id):
+            if collaborator.email == email:
+                return collaborator.id
     return None
 
 def transfer_list(keep_list_name: str, todoist_project: str, due: str, sync_labels: bool, assignee_email: str):

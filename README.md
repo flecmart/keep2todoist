@@ -30,8 +30,11 @@ keep_lists:  # list your keep lists on this level
   - Todo:
       sync_labels: false # required: transfer labels from gkeep lists to todoist items
       due_str_en: 'today' # optional: you can set a due date in english here
-      assignee_email: 'name@domain.tld' # optional: the email of the person to be assigned, requires todoist_project to be a shared project.
       # if todoist_project is not set your task will go into the todoist inbox
+  - Shared:
+      sync_labels: true
+      assignee_email: 'name@domain.tld' # optional: the email of the person to be assigned, requires todoist_project to be a shared project.
+      todoist_project: 'Chores' # not optional in this case, should be a shared project
   - Shopping:
       sync_labels: false
       todoist_project: 'Shopping' # optional: you can choose a project for todoist here

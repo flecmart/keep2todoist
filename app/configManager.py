@@ -3,10 +3,9 @@ import yaml
 import os
 import yamale
 
-from app import parse_key
-
 log = logging.getLogger(__name__)
 SCHEMA = './config.schema.yaml'
+
 class ConfigManager():
     def __init__(self, path_to_config: str):
         """Initialize config
@@ -62,7 +61,7 @@ class ConfigManager():
                 log.error(f"Error validating data '{result.data}' with '{result.schema}'")
                 for error in result.errors:
                     log.error(f" -> {error}")
-            raise Exception('schema validation failed!')
+            raise Exception('schema validation failed ❌')
     
     def validate_configuration(self):
         """Validate config.yaml
@@ -72,6 +71,7 @@ class ConfigManager():
         with open(self.path_to_config, 'r') as yamlfile:
             config = yaml.safe_load(yamlfile)
         self.validate_assignee_email(config_validate=config)
+        log.info('configuration validation passed 👍')
         
     def validate_assignee_email(self, config_validate: dict):
         """For each defined list in the config, validate if todoist_project is defined when assignee_email is present
@@ -85,8 +85,9 @@ class ConfigManager():
         for keep_list in config_validate['keep_lists']:
             keep_list_name = list(keep_list.keys())[0]
             keep_list_options = list(keep_list.values())[0]
-            if parse_key(keep_list_options, 'assignee_email') and not parse_key(keep_list_options, 'todoist_project'):
-                raise Exception(f'Validation failed for {keep_list_name}: lists with "assignee_email" have to have a shared "todoist_project" defined')
+            if self.parse_key(keep_list_options, 'assignee_email') and not self.parse_key(keep_list_options, 'todoist_project'):
+                log.error(f'Validation failed for "{keep_list_name}" ❌')
+                raise Exception(f'Validation failed for "{keep_list_name}": lists with "assignee_email" have to define a shared "todoist_project"')
     
     @property
     def config(self):

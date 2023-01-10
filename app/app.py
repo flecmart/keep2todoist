@@ -146,7 +146,7 @@ if __name__ == '__main__':
                         level=logging.INFO,
                         format='%(asctime)s %(name)s-%(levelname)s: %(message)s',
                         datefmt='%Y-%m-%d %H:%M:%S')
-    configManager = ConfigManager('config.yaml')
+    configManager = ConfigManager('config.schema.yaml', 'config.yaml')
 
     keep = gkeepapi.Keep()
     keep.login(configManager.config['google_username'], configManager.config['google_password'], device_id='3ee9002270d00157')

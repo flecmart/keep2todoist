@@ -8,6 +8,9 @@ from app.configManager import ConfigManager, ConfigValidationError
 schema = 'app/config.schema.yaml'
 config_root_folder = 'tests/test_configs'
 
+def test_example_config():
+    cm = ConfigManager(schema, 'app/config.example.yaml')
+
 def test_valid_full_config():
     cm = ConfigManager(schema, f'{config_root_folder}/valid.full.yaml')
     

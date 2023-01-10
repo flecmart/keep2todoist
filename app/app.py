@@ -12,14 +12,14 @@ log = logging.getLogger('app')
 def restart():
     log.info('restarting...')
     os.execv(sys.executable, ['python'] + sys.argv)
-    
+
 
 def ping_healthcheck(healthcheck_url: str):
     """Ping some kind of healthcheck url providing a possibility to monitor this service.
     """
     import socket
     import urllib.request
-    
+
     try:
         log.info(f'ping {healthcheck_url}')
         urllib.request.urlopen(healthcheck_url, timeout=10)
@@ -59,7 +59,7 @@ def get_labels_from_todoist(api: TodoistAPI):
 
 
 def create_todoist_labels_if_necessary(labels: list, api: TodoistAPI):
-    """Compare keep labels to labels from todoist api and create new labels if necessary. 
+    """Compare keep labels to labels from todoist api and create new labels if necessary.
 
     Args:
         labels (list): list of labels
@@ -103,13 +103,19 @@ def get_labels_on_gkeep_list(gkeep_list, gkeeplabels):
         return None
     log.info(f'list_labels on {gkeep_list.title}: {labels_on_list}')
     return labels_on_list
-    
+
 
 def parse_key(keep_list: dict, key: str):
     return keep_list[key] if key in keep_list else None
-    
 
-def transfer_list(keep_list_name: str, todoist_project: str, due: str, sync_labels: bool):
+def get_assignee(api: TodoistAPI, project_id: str, email: str):
+    if project_id and email:
+        for collaborator in api.get_collaborators(project_id):
+            if collaborator.email == email:
+                return collaborator.id
+    return None
+
+def transfer_list(keep_list_name: str, todoist_project: str, due: str, sync_labels: bool, assignee_email: str):
     keep.sync()
     all_labels = keep.labels() if sync_labels else None
     for keep_list in (keep.find(func=lambda x: x.title == keep_list_name)):
@@ -120,15 +126,16 @@ def transfer_list(keep_list_name: str, todoist_project: str, due: str, sync_labe
                 todoist_labels = create_todoist_labels_if_necessary(labels, todoist_api)
             if todoist_project:
                 todoist_project_id = get_todoist_project_id(todoist_api, todoist_project)
-                todoist_api.add_task(content=item.text, project_id=todoist_project_id, due_string=due, due_lang='en', labels=todoist_labels)
+                assignee = get_assignee(todoist_api, todoist_project_id, assignee_email)
+                todoist_api.add_task(content=item.text, project_id=todoist_project_id, due_string=due, due_lang='en', labels=todoist_labels, assignee_id=assignee)
             else:
                 todoist_api.add_task(content=item.text, due_string=due, due_lang='en', labels=todoist_labels)
-            
+
             log.info(f'\t-> {item.text}')
             item.delete()
     keep.sync()
 
-    
+
 def update():
     if configManager.needs_update():
         configManager.update_configuration()
@@ -137,10 +144,11 @@ def update():
         keep_list_name = list(keep_list.keys())[0]
         keep_list_options = list(keep_list.values())[0]
         log.info(f'transfering {keep_list_name} list from keep to todoist')
-        transfer_list(keep_list_name, 
-                      parse_key(keep_list_options, 'todoist_project'), 
-                      parse_key(keep_list_options, 'due_str_en'), 
-                      parse_key(keep_list_options, 'sync_labels'))
+        transfer_list(keep_list_name,
+                      parse_key(keep_list_options, 'todoist_project'),
+                      parse_key(keep_list_options, 'due_str_en'),
+                      parse_key(keep_list_options, 'sync_labels'),
+                      parse_key(keep_list_options, 'assignee_email'))
 
 
 if __name__ == '__main__':
@@ -149,24 +157,24 @@ if __name__ == '__main__':
                         format='%(asctime)s %(name)s-%(levelname)s: %(message)s',
                         datefmt='%Y-%m-%d %H:%M:%S')
     configManager = ConfigManager('config.yaml')
-    
+
     keep = gkeepapi.Keep()
     keep.login(configManager.config['google_username'], configManager.config['google_password'], device_id='3ee9002270d00157')
-    
+
     todoist_api = TodoistAPI(configManager.config['todoist_api_token'])
-    
+
     update_interval_s = configManager.config['update_interval_s']
     schedule.every(update_interval_s).seconds.do(update)
-    
+
     if 'healthcheck' in configManager.config.keys():
         healthcheck_url = configManager.config['healthcheck']['url']
         healtheck_period_min = configManager.config['healthcheck']['period_min']
         ping_healthcheck(healthcheck_url)
         schedule.every(healtheck_period_min).minutes.do(ping_healthcheck, healthcheck_url=healthcheck_url)
-    
+
     log.info('start scheduler')
     update()
-    
+
     while True:
         schedule.run_pending()
         time.sleep(1)

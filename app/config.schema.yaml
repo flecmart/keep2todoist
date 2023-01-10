@@ -11,6 +11,7 @@ list_mapping_attributes:
   sync_labels: bool(required=True)
   due_str_en: str(required=False)
   todoist_project: str(required=False)
+  assignee_email: str(required=False)
 ---
 healthcheck_attributes:
   url: str(required=True)

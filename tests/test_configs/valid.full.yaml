@@ -1,0 +1,20 @@
+update_interval_s: 60
+google_username: yourUsername
+google_password: canBeAnAppPassword
+todoist_api_token: todoistApiKey
+healthcheck:
+  url: https://hc-ping.com/someuuid
+  period_min: 30
+keep_lists:
+  - Todo:
+      sync_labels: false
+      due_str_en: 'today'
+  - Shared:
+      sync_labels: true
+      assignee_email: 'name@domain.tld'
+      todoist_project: 'Chores'
+  - Shopping:
+      sync_labels: false
+      todoist_project: 'Shopping'
+  - Test:
+      sync_labels: false

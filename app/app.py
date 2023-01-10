@@ -6,6 +6,7 @@ import sys
 import os
 from todoist_api_python.api import TodoistAPI
 from configManager import ConfigManager
+parse_key = ConfigManager.parse_key
 
 log = logging.getLogger('app')
 
@@ -13,9 +14,8 @@ def restart():
     log.info('restarting...')
     os.execv(sys.executable, ['python'] + sys.argv)
 
-
 def ping_healthcheck(healthcheck_url: str):
-    """Ping some kind of healthcheck url providing a possibility to monitor this service.
+    """Ping some kind of healthcheck url providing a possibility to monitor this service
     """
     import socket
     import urllib.request
@@ -26,9 +26,8 @@ def ping_healthcheck(healthcheck_url: str):
     except socket.error as ex:
         log.warning(f'failed to ping {healthcheck_url}: {ex}')
 
-
 def get_todoist_project_id(api: TodoistAPI, name):
-    """Get todoist project id by name.
+    """Get todoist project id by name
 
     Args:
         api (TodoistAPI): api
@@ -42,9 +41,8 @@ def get_todoist_project_id(api: TodoistAPI, name):
             return project.id
     return None
 
-
 def get_labels_from_todoist(api: TodoistAPI):
-    """Get existing labels from todoist.
+    """Get existing labels from todoist
 
     Args:
         api (TodoistAPI): api
@@ -57,9 +55,8 @@ def get_labels_from_todoist(api: TodoistAPI):
     except Exception as ex:
         log.exception(ex)
 
-
 def create_todoist_labels_if_necessary(labels: list, api: TodoistAPI):
-    """Compare keep labels to labels from todoist api and create new labels if necessary.
+    """Compare keep labels to labels from todoist api and create new labels if necessary
 
     Args:
         labels (list): list of labels
@@ -84,9 +81,8 @@ def create_todoist_labels_if_necessary(labels: list, api: TodoistAPI):
                 log.exception(ex)
     return labels_for_task
 
-
 def get_labels_on_gkeep_list(gkeep_list, gkeeplabels):
-    """Get all labels on a gkeep list.
+    """Get all labels on a gkeep list
 
     Args:
         gkeep_list (keepapi.node.List): Google keep list from gkeepapi
@@ -103,10 +99,6 @@ def get_labels_on_gkeep_list(gkeep_list, gkeeplabels):
         return None
     log.info(f'list_labels on {gkeep_list.title}: {labels_on_list}')
     return labels_on_list
-
-
-def parse_key(keep_list: dict, key: str):
-    return keep_list[key] if key in keep_list else None
 
 def get_assignee(api: TodoistAPI, project_id: str, email: str):
     if project_id and email:
@@ -135,7 +127,6 @@ def transfer_list(keep_list_name: str, todoist_project: str, due: str, sync_labe
             item.delete()
     keep.sync()
 
-
 def update():
     if configManager.needs_update():
         configManager.update_configuration()
@@ -149,7 +140,6 @@ def update():
                       parse_key(keep_list_options, 'due_str_en'),
                       parse_key(keep_list_options, 'sync_labels'),
                       parse_key(keep_list_options, 'assignee_email'))
-
 
 if __name__ == '__main__':
     logging.basicConfig(stream=sys.stdout,

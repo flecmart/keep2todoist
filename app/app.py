@@ -6,6 +6,7 @@ import sys
 import os
 from todoist_api_python.api import TodoistAPI
 from configManager import ConfigManager
+parse_key = ConfigManager.parse_key
 
 log = logging.getLogger('app')
 
@@ -98,9 +99,6 @@ def get_labels_on_gkeep_list(gkeep_list, gkeeplabels):
         return None
     log.info(f'list_labels on {gkeep_list.title}: {labels_on_list}')
     return labels_on_list
-
-def parse_key(keep_list: dict, key: str):
-    return keep_list[key] if key in keep_list else None
 
 def get_assignee(api: TodoistAPI, project_id: str, email: str):
     if project_id and email:

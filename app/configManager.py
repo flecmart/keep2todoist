@@ -96,3 +96,7 @@ class ConfigManager():
             dict: deserialized config.yaml
         """
         return self._config
+    
+    @staticmethod
+    def parse_key(keep_list: dict, key: str):
+        return keep_list[key] if key in keep_list else None

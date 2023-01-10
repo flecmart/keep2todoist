@@ -5,3 +5,5 @@ todoist_api_token: todoistApiKey
 keep_lists:
   - SomeList:
       sync_labels: false
+      assignee_email: 'name@domain.tld'
+      todoist_project: 'shared'

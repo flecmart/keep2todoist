@@ -4,17 +4,18 @@ import os
 import yamale
 
 log = logging.getLogger(__name__)
-SCHEMA = './config.schema.yaml'
 
 class ConfigManager():
-    def __init__(self, path_to_config: str):
+    def __init__(self, path_to_schema: str, path_to_config: str):
         """Initialize config
 
         Args:
+            path_to_schema (str): path to config.schema.yaml
             path_to_config (str): path to config.yaml
         """
+        self.path_to_schema = path_to_schema
         self.path_to_config = path_to_config
-        self.schema = yamale.make_schema(SCHEMA)
+        self.schema = yamale.make_schema(path_to_schema)
         self._cached_st_mtime = os.stat(path_to_config).st_mtime
         self._config = dict()
         self.update_configuration()
@@ -53,7 +54,7 @@ class ConfigManager():
         """
         data = yamale.make_data(self.path_to_config)
         try:
-            log.info(f"validating configuration with schema '{SCHEMA}'")
+            log.info(f"validating configuration with schema '{self.path_to_schema}'")
             yamale.validate(self.schema, data)
             log.info('schema validation passed 👍')
         except yamale.YamaleError as ex:
@@ -61,7 +62,7 @@ class ConfigManager():
                 log.error(f"Error validating data '{result.data}' with '{result.schema}'")
                 for error in result.errors:
                     log.error(f" -> {error}")
-            raise Exception('schema validation failed ❌')
+            raise ConfigValidationError('schema validation failed ❌')
     
     def validate_configuration(self):
         """Validate config.yaml
@@ -87,7 +88,7 @@ class ConfigManager():
             keep_list_options = list(keep_list.values())[0]
             if self.parse_key(keep_list_options, 'assignee_email') and not self.parse_key(keep_list_options, 'todoist_project'):
                 log.error(f'Validation failed for "{keep_list_name}" ❌')
-                raise Exception(f'Validation failed for "{keep_list_name}": lists with "assignee_email" have to define a shared "todoist_project"')
+                raise ConfigValidationError(f'Validation failed for "{keep_list_name}": lists with "assignee_email" have to define a shared "todoist_project"')
     
     @property
     def config(self):
@@ -101,3 +102,6 @@ class ConfigManager():
     @staticmethod
     def parse_key(keep_list: dict, key: str):
         return keep_list[key] if key in keep_list else None
+
+class ConfigValidationError(Exception):
+    pass

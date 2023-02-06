@@ -53,18 +53,31 @@ If configured it will provide you with an url and the app will ping this url eve
 
 ## Start
 
-Either use docker/docker-compose to start the service:
+### docker
+
+You can use docker/docker-compose to start the service:
 
 ```bash
 docker-compose up -d
 ```
 
-or go to the app folder, install requirements and run the code directly:
+This has the advantage that the service will be restarted automatically on reboot or error.
+
+### Pre-built docker image
+
+Latest  docker image is also available at `ghcr.io/flecmart/keep2todoist:latest
+`
+
+```bash
+docker run -v config.yaml:/app/config.yaml --restart always ghcr.io/flecmart/keep2todoist:latest
+```
+
+### Local python installation
+
+Tested this only with `python >= 3.9`
 
 ```bash
 cd app
 pip install -r requirements.txt
 python3 app.py
 ```
-
-docker-compose has the advantage that the service will be restarted automatically on reboot or error.

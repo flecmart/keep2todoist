@@ -81,3 +81,14 @@ cd app
 pip install -r requirements.txt
 python3 app.py
 ```
+
+## Related projects
+
+- Tool to improve the alexa integration for todoist: https://github.com/ChristianKuehnel/todoistautomation
+
+## Thanks
+
+This tool relies heavily on and would not be possible without:
+
+- https://github.com/kiwiz/gkeepapi
+- https://developer.todoist.com/guides/#developing-with-todoist

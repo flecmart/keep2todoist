@@ -127,6 +127,11 @@ def transfer_list(keep_list_name: str, todoist_project: str, due: str, sync_labe
             item.delete()
     keep.sync()
 
+def transfer_untitled_notes(todoist_project: str, due: str):
+    print(todoist_project)
+    print(due)
+    #TODO: implement this feature
+
 def update():
     if configManager.needs_update():
         configManager.update_configuration()
@@ -140,6 +145,9 @@ def update():
                       parse_key(keep_list_options, 'due_str_en'),
                       parse_key(keep_list_options, 'sync_labels'),
                       parse_key(keep_list_options, 'assignee_email'))
+    if 'untitled_notes' in  configManager.config.keys():
+        untitled_notes_options = configManager.config['untitled_notes']
+        transfer_untitled_notes(parse_key(untitled_notes_options, 'todoist_project'), parse_key(untitled_notes_options, 'due_str_en'))
 
 if __name__ == '__main__':
     logging.basicConfig(stream=sys.stdout,

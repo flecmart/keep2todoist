@@ -3,6 +3,7 @@ google_username: str(required=True)
 google_password: str(required=True)
 todoist_api_token: str(required=True)
 healthcheck: include('healthcheck_attributes', required=False)
+untitled_notes: include('untitled_notes_attributes', required=False)
 keep_lists: list(include('list_mapping'))
 ---
 list_mapping: map(include('list_mapping_attributes'))
@@ -16,3 +17,7 @@ list_mapping_attributes:
 healthcheck_attributes:
   url: str(required=True)
   period_min: int(required=True)
+---
+untitled_notes_attributes:
+  due_str_en: str(required=False)
+  todoist_project: str(required=False)

@@ -20,4 +20,3 @@ healthcheck_attributes:
 ---
 untitled_notes_attributes:
   due_str_en: str(required=False)
-  todoist_project: str(required=False)

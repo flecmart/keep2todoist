@@ -128,9 +128,18 @@ def transfer_list(keep_list_name: str, todoist_project: str, due: str, sync_labe
     keep.sync()
 
 def transfer_untitled_notes(todoist_project: str, due: str):
-    print(todoist_project)
-    print(due)
-    #TODO: implement this feature
+    keep.sync()
+    if todoist_project:
+            todoist_project_id = get_todoist_project_id(todoist_api, todoist_project)
+    for untitled_note in keep.find(func=lambda x: x.title == ''):
+        print(f'id {untitled_note.id}: {untitled_note.text}')
+        if todoist_project_id:
+            # TODO: is assignee useful here, too? then this has to be validated...
+            pass # add task to todist_project
+        else:
+            pass # add tasl to todoist_inbox
+        #untitled_note.delete()
+    keep.sync()
 
 def update():
     if configManager.needs_update():

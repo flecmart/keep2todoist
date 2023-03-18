@@ -127,12 +127,16 @@ def transfer_list(keep_list_name: str, todoist_project: str, due: str, sync_labe
             item.delete()
     keep.sync()
 
-def transfer_untitled_notes(due: str):
+def transfer_untitled_notes(add_label: str, due: str):
     keep.sync()
+    todoist_labels = []
+    if add_label:
+        labels = [add_label]
+        todoist_labels = create_todoist_labels_if_necessary(labels, todoist_api)
     for untitled_note in keep.find(func=lambda x: x.title == ''):
         log.info(f'transfering untitled note from keep to todoist:')
         log.info(f'\t-> {untitled_note.text}')
-        todoist_api.add_task(content=untitled_note.text, due_string=due, due_lang='en')
+        todoist_api.add_task(content=untitled_note.text, due_string=due, due_lang='en', labels=todoist_labels)
         untitled_note.trash()
     keep.sync()
 
@@ -151,7 +155,7 @@ def update():
                       parse_key(keep_list_options, 'assignee_email'))
     if 'untitled_notes' in  configManager.config.keys():
         untitled_notes_options = configManager.config['untitled_notes']
-        transfer_untitled_notes(parse_key(untitled_notes_options, 'due_str_en'))
+        transfer_untitled_notes(parse_key(untitled_notes_options, 'add_label'), parse_key(untitled_notes_options, 'due_str_en'))
 
 if __name__ == '__main__':
     logging.basicConfig(stream=sys.stdout,

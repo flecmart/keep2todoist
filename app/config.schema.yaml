@@ -19,4 +19,5 @@ healthcheck_attributes:
   period_min: int(required=True)
 ---
 untitled_notes_attributes:
+  add_label: str(required=True)
   due_str_en: str(required=False)

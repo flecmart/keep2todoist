@@ -127,18 +127,13 @@ def transfer_list(keep_list_name: str, todoist_project: str, due: str, sync_labe
             item.delete()
     keep.sync()
 
-def transfer_untitled_notes(todoist_project: str, due: str):
+def transfer_untitled_notes(due: str):
     keep.sync()
-    if todoist_project:
-            todoist_project_id = get_todoist_project_id(todoist_api, todoist_project)
     for untitled_note in keep.find(func=lambda x: x.title == ''):
-        print(f'id {untitled_note.id}: {untitled_note.text}')
-        if todoist_project_id:
-            # TODO: is assignee useful here, too? then this has to be validated...
-            pass # add task to todist_project
-        else:
-            pass # add tasl to todoist_inbox
-        #untitled_note.delete()
+        log.info(f'transfering untitled note from keep to todoist:')
+        log.info(f'\t-> {untitled_note.text}')
+        todoist_api.add_task(content=untitled_note.text, due_string=due, due_lang='en')
+        untitled_note.trash()
     keep.sync()
 
 def update():
@@ -156,7 +151,7 @@ def update():
                       parse_key(keep_list_options, 'assignee_email'))
     if 'untitled_notes' in  configManager.config.keys():
         untitled_notes_options = configManager.config['untitled_notes']
-        transfer_untitled_notes(parse_key(untitled_notes_options, 'todoist_project'), parse_key(untitled_notes_options, 'due_str_en'))
+        transfer_untitled_notes(parse_key(untitled_notes_options, 'due_str_en'))
 
 if __name__ == '__main__':
     logging.basicConfig(stream=sys.stdout,

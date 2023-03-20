@@ -5,6 +5,9 @@ todoist_api_token: todoistApiKey
 healthcheck:
   url: https://hc-ping.com/someuuid
   period_min: 30
+untitled_notes: # optional: move all untitled notes to todoist inbox
+  add_label: 'Sync' # required: add label to todoist note
+  due_str_en: 'today' # optional: you can set a due date in english here
 keep_lists:
   - Todo:
       sync_labels: false

@@ -36,10 +36,13 @@ def get_todoist_project_id(api: TodoistAPI, name):
     Returns:
         int: project id
     """
-    for project in api.get_projects():
-        if project.name == name:
-            return project.id
-    return None
+    try:
+        for project in api.get_projects():
+            if project.name == name:
+                return project.id
+    except Exception as ex:
+        log.error(f'failed to get projects from todoist api: {ex}')
+        return None
 
 def get_labels_from_todoist(api: TodoistAPI):
     """Get existing labels from todoist
@@ -53,7 +56,8 @@ def get_labels_from_todoist(api: TodoistAPI):
     try:
         return api.get_labels()
     except Exception as ex:
-        log.exception(ex)
+        log.error(f'failed to get labels from todoist api: {ex}')
+        return []
 
 def create_todoist_labels_if_necessary(labels: list, api: TodoistAPI):
     """Compare keep labels to labels from todoist api and create new labels if necessary
@@ -73,12 +77,9 @@ def create_todoist_labels_if_necessary(labels: list, api: TodoistAPI):
                 log.debug(f'found todoist label {label} with id {todoist_label.id}')
                 labels_for_task.append(todoist_label.name)
         if len(labels_for_task) <= i:
-            try:
-                new_label = api.add_label(name=label)
-                log.debug(f'created todoist label {label} with id {new_label.id}')
-                labels_for_task.append(new_label.name)
-            except Exception as ex:
-                log.exception(ex)
+            new_label = api.add_label(name=label)
+            log.debug(f'created todoist label {label} with id {new_label.id}')
+            labels_for_task.append(new_label.name)
     return labels_for_task
 
 def get_labels_on_gkeep_list(gkeep_list, gkeeplabels):

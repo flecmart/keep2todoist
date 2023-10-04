@@ -137,3 +137,5 @@ app/config.*.yaml
 
 # vscode
 .vscode/launch.json
+
+gkeepapi_token.json

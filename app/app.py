@@ -27,7 +27,7 @@ def google_login(keep: gkeepapi.Keep, user: str, password: str, device_id: str):
     logged_in = False
     
     try:
-        with open('gkeepapi_token.json', 'r') as cached_token:
+        with open('gkeepapi_token', 'r') as cached_token:
             token = cached_token.read()
     except FileNotFoundError:
         token = None
@@ -46,7 +46,7 @@ def google_login(keep: gkeepapi.Keep, user: str, password: str, device_id: str):
             keep.login(user, password, sync=False, device_id=device_id)
             logged_in = True
             token = keep.getMasterToken()
-            with open('gkeepapi_token.json', 'w') as cached_token:
+            with open('gkeepapi_token', 'w') as cached_token:
                 cached_token.write(token)
             log.info("authenticated successfully 👍")
         except gkeepapi.exception.LoginException as ex:

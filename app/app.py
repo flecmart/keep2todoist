@@ -13,7 +13,46 @@ log = logging.getLogger('app')
 def restart():
     log.info('restarting...')
     os.execv(sys.executable, ['python'] + sys.argv)
+    
+def google_login(keep: gkeepapi.Keep, user: str, password: str, device_id: str):
+    """Authenticate gkeepapi. Try to use cached_token.
 
+    Args:
+        keep (gkeepapi.Keep): Keep object from gkeepapi
+        user (str): google username
+        password (str): google password, prefered one from https://security.google.com/settings/security/apppasswords
+        device_id (str): device_id to use for authentication
+    """
+    log.info("authenticating gkeepapi")
+    logged_in = False
+    
+    try:
+        with open('gkeepapi_token.json', 'r') as cached_token:
+            token = cached_token.read()
+    except FileNotFoundError:
+        token = None
+    
+    if token:
+        try:
+            keep.resume(user, token, sync=False, device_id=device_id)
+            logged_in = True
+            log.info("Successfully authenticated with token 👍")
+        except gkeepapi.exception.LoginException:
+            log.warning("invalid token ⚠️")
+            
+    if not logged_in:
+        try:
+            log.info('requesting new token')
+            keep.login(user, password, sync=False, device_id=device_id)
+            logged_in = True
+            token = keep.getMasterToken()
+            with open('gkeepapi_token.json', 'w') as cached_token:
+                cached_token.write(token)
+            log.info("authenticated successfully 👍")
+        except gkeepapi.exception.LoginException as ex:
+            log.info(f'failed to authenticate ❌ {ex}')
+            sys.exit(1)
+            
 def ping_healthcheck(healthcheck_url: str):
     """Ping some kind of healthcheck url providing a possibility to monitor this service
     """
@@ -166,7 +205,7 @@ if __name__ == '__main__':
     configManager = ConfigManager('config.schema.yaml', 'config.yaml')
 
     keep = gkeepapi.Keep()
-    keep.login(configManager.config['google_username'], configManager.config['google_password'], device_id='3ee9002270d00157')
+    google_login(keep, configManager.config['google_username'], configManager.config['google_password'], device_id='3ee9002270d00157')
 
     todoist_api = TodoistAPI(configManager.config['todoist_api_token'])
 

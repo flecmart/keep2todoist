@@ -1,0 +1,20 @@
+name: Cleanup docker images
+
+on:
+  workflow_dispatch:
+
+jobs:
+  
+  cleanup:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Delete untagged ghcr
+      uses: Chizkiyahu/delete-untagged-ghcr-action@v2
+      with:
+        token: ${{ secrets.PACKAGES_TOKEN }}
+        repository: ${{ github.repository }}
+        package_name: keep2todoist
+        untagged_only: true
+        owner_type: user

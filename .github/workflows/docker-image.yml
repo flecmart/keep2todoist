@@ -24,7 +24,7 @@ jobs:
       - name: Build the Docker image
         run: |
           cd app
-          docker build . --file Dockerfile --tag my-image-name:$(date +%s)
+          docker build . --file Dockerfile --tag keep2todoist:$(date +%s)
         
         
   build:

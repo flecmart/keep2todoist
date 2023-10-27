@@ -12,8 +12,6 @@ It is not a real sync but just a **one way** keep->todoist.
 - Moved items will be deleted from keep's list
 - Labels on google keep lists will be attached to their corresponding todo tasks
 
-This works also with archived google keep lists (in case you don't want your intermediate lists to distract you if you're actually using google keep).
-
 ## Configuration
 
 Create a `config.yaml` from `config.example.yaml`:

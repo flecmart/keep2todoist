@@ -70,7 +70,7 @@ Latest  docker image is also available at `ghcr.io/flecmart/keep2todoist:latest
 `
 
 ```bash
-docker run -v config.yaml:/app/config.yaml --restart always ghcr.io/flecmart/keep2todoist:latest
+docker run -v ./config.yaml:/app/config.yaml --restart always ghcr.io/flecmart/keep2todoist:latest
 ```
 
 ### Local python installation

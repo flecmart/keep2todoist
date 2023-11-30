@@ -6,9 +6,11 @@ import sys
 import os
 from todoist_api_python.api import TodoistAPI
 from configManager import ConfigManager
+from syncErrorTracker import SyncErrorTracker
 parse_key = ConfigManager.parse_key
 
 log = logging.getLogger('app')
+sync_errors = SyncErrorTracker()
 
 def restart():
     log.info('restarting...')
@@ -59,11 +61,12 @@ def ping_healthcheck(healthcheck_url: str):
     import socket
     import urllib.request
 
-    try:
-        log.info(f'ping {healthcheck_url}')
-        urllib.request.urlopen(healthcheck_url, timeout=10)
-    except socket.error as ex:
-        log.warning(f'failed to ping {healthcheck_url}: {ex}')
+    if sync_errors.healthy:
+        try:
+            log.info(f'ping {healthcheck_url}')
+            urllib.request.urlopen(healthcheck_url, timeout=10)
+        except socket.error as ex:
+            log.warning(f'failed to ping {healthcheck_url}: {ex}')
 
 def get_todoist_project_id(api: TodoistAPI, name):
     """Get todoist project id by name
@@ -153,18 +156,29 @@ def transfer_list(keep_list_name: str, todoist_project: str, due: str, sync_labe
     for keep_list in (keep.find(func=lambda x: x.title == keep_list_name)):
         labels = get_labels_on_gkeep_list(keep_list, all_labels) if sync_labels else None
         for item in keep_list.items:
-            todoist_labels = []
-            if labels:
-                todoist_labels = create_todoist_labels_if_necessary(labels, todoist_api)
-            if todoist_project:
-                todoist_project_id = get_todoist_project_id(todoist_api, todoist_project)
-                assignee = get_assignee(todoist_api, todoist_project_id, assignee_email)
-                todoist_api.add_task(content=item.text, project_id=todoist_project_id, due_string=due, due_lang='en', labels=todoist_labels, assignee_id=assignee)
-            else:
-                todoist_api.add_task(content=item.text, due_string=due, due_lang='en', labels=todoist_labels)
+            try:
+                task_added = None
+                todoist_labels = []
+                if labels:
+                    todoist_labels = create_todoist_labels_if_necessary(labels, todoist_api)
+                if todoist_project:
+                    todoist_project_id = get_todoist_project_id(todoist_api, todoist_project)
+                    assignee = get_assignee(todoist_api, todoist_project_id, assignee_email)
+                    task_added = todoist_api.add_task(content=item.text, project_id=todoist_project_id, due_string=due, due_lang='en', labels=todoist_labels, assignee_id=assignee)
+                else:
+                    task_added = todoist_api.add_task(content=item.text, due_string=due, due_lang='en', labels=todoist_labels)
+            except Exception as ex:
+                sync_errors.record_error(keep_list_name, item.text, ex)
 
+            if task_added:
+                try:
+                    item.delete()
+                except Exception as ex:
+                    sync_errors.record_error(keep_list_name, item.text, ex)
+                    todoist_api.delete_task(task_added.id)
+                    
+            sync_errors.successful_sync(keep_list_name, item.text)
             log.info(f'\t-> {item.text}')
-            item.delete()
     keep.sync()
 
 def transfer_untitled_notes(add_label: str, due: str):
@@ -175,9 +189,21 @@ def transfer_untitled_notes(add_label: str, due: str):
         todoist_labels = create_todoist_labels_if_necessary(labels, todoist_api)
     for untitled_note in keep.find(func=lambda x: x.title == ''):
         log.info(f'transfering untitled note from keep to todoist:')
+        task_added = None
+        try:
+            task_added = todoist_api.add_task(content=untitled_note.text, due_string=due, due_lang='en', labels=todoist_labels)
+        except Exception as ex:
+            sync_errors.record_error('untitled', untitled_note, ex)
+        
+        if task_added:
+            try:
+                untitled_note.trash()
+            except Exception as ex:
+                sync_errors.record_error('untitled', untitled_note, ex)
+                todoist_api.delete_task(task_added.id)
+        
+        sync_errors.successful_sync('untitled', untitled_note)
         log.info(f'\t-> {untitled_note.text}')
-        todoist_api.add_task(content=untitled_note.text, due_string=due, due_lang='en', labels=todoist_labels)
-        untitled_note.trash()
     keep.sync()
 
 def update():

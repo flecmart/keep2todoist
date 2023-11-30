@@ -41,7 +41,7 @@ class SyncErrorTracker():
             self._errors[error_key]['count'] += 1
             self._errors[error_key]['exceptions'].append(exception)
             
-        if self._errors[error_key]['count'] > self._unhealthy_after and self._healthy:
+        if self._errors[error_key]['count'] >= self._unhealthy_after and self._healthy:
             self._healthy = False
             log.error('Unhealthy sync state')
             
@@ -50,7 +50,7 @@ class SyncErrorTracker():
         if error_key in self._errors:
             del self._errors[error_key]
             
-        if all(error['count'] <= self._unhealthy_after for error in self._errors.values()) and not self._healthy:
+        if all(error['count'] < self._unhealthy_after for error in self._errors.values()) and not self._healthy:
             self._healthy = True
             log.info('Sync state is healthy again')
         

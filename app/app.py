@@ -238,14 +238,14 @@ if __name__ == '__main__':
     update_interval_s = configManager.config['update_interval_s']
     schedule.every(update_interval_s).seconds.do(update)
 
+    log.info('start scheduler')
+    update()
+    
     if 'healthcheck' in configManager.config.keys():
         healthcheck_url = configManager.config['healthcheck']['url']
         healtheck_period_min = configManager.config['healthcheck']['period_min']
         ping_healthcheck(healthcheck_url)
         schedule.every(healtheck_period_min).minutes.do(ping_healthcheck, healthcheck_url=healthcheck_url)
-
-    log.info('start scheduler')
-    update()
 
     while True:
         schedule.run_pending()

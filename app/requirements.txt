@@ -1,4 +1,4 @@
-urllib3<3
+urllib3<2
 gpsoauth==1.0.2
 gkeepapi==0.14.2
 todoist-api-python==2.1.5

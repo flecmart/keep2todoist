@@ -19,7 +19,7 @@ Create a `config.yaml` from `config.example.yaml`:
 ```yaml
 update_interval_s: 60
 google_username: yourUsername
-google_password: canBeAnAppPassword
+google_token: oauthMasterToken
 todoist_api_token: todoistApiKey
 healthcheck: # optional: configure some kind of healtcheck endpoint providing service monitoring, e.g. https://healthchecks.io/
   url: https://hc-ping.com/someuuid
@@ -43,7 +43,7 @@ keep_lists:  # list your keep lists on this level
       sync_labels: false
 ```
 
-- It is recommended that you don't use your google main credentials. Instead go to https://myaccount.google.com/apppasswords and generate an app password specifically for this tool. That way you still can enable 2FA for your google account.
+- For obtaining the google_token follow [Get master token](#get-master-token)
 - Your todoist token can be found in todoist settings->integrations.
 - Changes in `config.yaml` will be detected automatically and the updated config will be reflected if the yaml is valid.
 - optionally, for setting up a healthcheck to ensure that your service is running you can use a service like https://healthchecks.io/:
@@ -51,6 +51,24 @@ keep_lists:  # list your keep lists on this level
 ![image](https://user-images.githubusercontent.com/10167243/192765584-80b1866d-7483-4693-9912-5fa769cbe0c4.png)
 
 If configured it will provide you with an url and the app will ping this url every `period_min` minutes. On the healtcheck's service side you configure a matching period & grace time. You can then get notified if a ping is missed, e.g. via mail.
+
+### Get master token
+
+1. Go to https://accounts.google.com/EmbeddedSetup
+2. Press F12 to open debugger in browser and open Application tab
+3. Log in with your google account and continue until you click on agree and the browser window keeps loading
+4. Obtain the oauth token from the debugger
+5. Run
+
+```bash
+docker run --rm -it --entrypoint /bin/sh python:3 -c 'pip install gpsoauth; python3 -c '\''print(__import__("gpsoauth").exchange_token(input("Email: "), input("OAuth Token: "), input("Android ID: ")))'\'
+```
+
+- Put in your google email, the obtained token and leave Android ID blank
+- Copy out the token from the response
+- Don't leak that token, it is a master token that can be used for authenticating your google account!
+
+For more details on how to obtain the token read through https://github.com/rukins/gpsoauth-java/blob/b74ebca999d0f5bd38a2eafe3c0d50be552f6385/README.md#receiving-an-authentication-token
 
 ## Start
 
@@ -91,5 +109,6 @@ python3 app.py
 
 This tool relies heavily on and would not be possible without:
 
+- https://github.com/simon-weber/gpsoauth
 - https://github.com/kiwiz/gkeepapi
 - https://developer.todoist.com/guides/#developing-with-todoist

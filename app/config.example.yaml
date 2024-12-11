@@ -1,6 +1,6 @@
 update_interval_s: 60
-google_username: yourUsername
-google_password: canBeAnAppPassword
+google_username: yourUsername # gmail account
+google_token: oauthMasterToken
 todoist_api_token: todoistApiKey
 healthcheck: # optional: configure some kind of healtcheck endpoint providing service monitoring, e.g. https://healthchecks.io/
   url: https://hc-ping.com/someuuid

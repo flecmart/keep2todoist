@@ -3,6 +3,6 @@ gpsoauth==1.0.2
 gkeepapi==0.14.2
 todoist-api-python==2.1.7
 pyyaml==6.0.2
-yamale==5.2.1
+yamale==6.0.0
 schedule==1.2.2
 pytest==8.3.4

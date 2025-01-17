@@ -1,6 +1,6 @@
 update_interval_s: 60
 google_username: yourUsername
-google_password: canBeAnAppPassword
+google_token: oAuthMasterToken
 todoist_api_token: todoistApiKey
 wrong_option: foo
 keep_lists:

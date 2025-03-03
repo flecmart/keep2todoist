@@ -1,6 +1,6 @@
 update_interval_s: int(min=1, required=True)
 google_username: str(required=True)
-google_password: str(required=True)
+google_token: str(required=True)
 todoist_api_token: str(required=True)
 healthcheck: include('healthcheck_attributes', required=False)
 untitled_notes: include('untitled_notes_attributes', required=False)

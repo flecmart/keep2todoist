@@ -79,9 +79,10 @@ def get_todoist_project_id(api: TodoistAPI, name):
         int: project id
     """
     try:
-        for project in api.get_projects():
-            if project.name == name:
-                return project.id
+        for project_list_page in api.get_projects():
+            for project in project_list_page:
+                if project.name == name:
+                    return project.id
     except Exception as ex:
         log.error(f'failed to get projects from todoist api: {ex}')
         return None
@@ -95,8 +96,11 @@ def get_labels_from_todoist(api: TodoistAPI):
     Returns:
         list<Label>: list of todoist labels
     """
+    all_labels = []
     try:
-        return api.get_labels()
+        for label_list_page in api.get_labels():
+            all_labels.extend(label_list_page)
+        return all_labels
     except Exception as ex:
         log.error(f'failed to get labels from todoist api: {ex}')
         return []
@@ -144,10 +148,11 @@ def get_labels_on_gkeep_list(gkeep_list, gkeeplabels):
     return labels_on_list
 
 def get_assignee(api: TodoistAPI, project_id: str, email: str):
-    if project_id and email:
-        for collaborator in api.get_collaborators(project_id):
-            if collaborator.email == email:
-                return collaborator.id
+    if project_id and email: 
+        for collaborator_list_page in api.get_collaborators(project_id):
+            for collaborator in collaborator_list_page:
+                if collaborator.email == email:
+                    return collaborator.id
     return None
 
 def transfer_list(keep_list_name: str, todoist_project: str, due: str, sync_labels: bool, assignee_email: str):

@@ -16,44 +16,23 @@ def restart():
     log.info('restarting...')
     os.execv(sys.executable, ['python'] + sys.argv)
     
-def google_login(keep: gkeepapi.Keep, user: str, password: str, device_id: str):
-    """Authenticate gkeepapi. Try to use cached_token.
+def google_login(keep: gkeepapi.Keep, user: str, master_token: str):
+    """Authenticate gkeepapi with master token
 
     Args:
         keep (gkeepapi.Keep): Keep object from gkeepapi
         user (str): google username
-        password (str): google password, prefered one from https://security.google.com/settings/security/apppasswords
-        device_id (str): device_id to use for authentication
+        master_token (str): google master token
     """
     log.info("authenticating gkeepapi")
-    logged_in = False
     
     try:
-        with open('gkeepapi_token', 'r') as cached_token:
-            token = cached_token.read()
-    except FileNotFoundError:
-        token = None
-    
-    if token:
-        try:
-            keep.resume(user, token, sync=False, device_id=device_id)
-            logged_in = True
-            log.info("Successfully authenticated with token 👍")
-        except gkeepapi.exception.LoginException:
-            log.warning("invalid token ⚠️")
-            
-    if not logged_in:
-        try:
-            log.info('requesting new token')
-            keep.login(user, password, sync=False, device_id=device_id)
-            logged_in = True
-            token = keep.getMasterToken()
-            with open('gkeepapi_token', 'w') as cached_token:
-                cached_token.write(token)
-            log.info("authenticated successfully 👍")
-        except gkeepapi.exception.LoginException as ex:
-            log.info(f'failed to authenticate ❌ {ex}')
-            sys.exit(1)
+        keep.authenticate(user, master_token)
+    except Exception as ex:
+        log.fatal(f'failed to authenticate ❌ {ex}')
+        sys.exit(1)
+        
+    log.info("authenticated successfully 👍")
             
 def ping_healthcheck(healthcheck_url: str):
     """Ping some kind of healthcheck url providing a possibility to monitor this service
@@ -79,9 +58,10 @@ def get_todoist_project_id(api: TodoistAPI, name):
         int: project id
     """
     try:
-        for project in api.get_projects():
-            if project.name == name:
-                return project.id
+        for project_list_page in api.get_projects():
+            for project in project_list_page:
+                if project.name == name:
+                    return project.id
     except Exception as ex:
         log.error(f'failed to get projects from todoist api: {ex}')
         return None
@@ -95,8 +75,11 @@ def get_labels_from_todoist(api: TodoistAPI):
     Returns:
         list<Label>: list of todoist labels
     """
+    all_labels = []
     try:
-        return api.get_labels()
+        for label_list_page in api.get_labels():
+            all_labels.extend(label_list_page)
+        return all_labels
     except Exception as ex:
         log.error(f'failed to get labels from todoist api: {ex}')
         return []
@@ -144,10 +127,11 @@ def get_labels_on_gkeep_list(gkeep_list, gkeeplabels):
     return labels_on_list
 
 def get_assignee(api: TodoistAPI, project_id: str, email: str):
-    if project_id and email:
-        for collaborator in api.get_collaborators(project_id):
-            if collaborator.email == email:
-                return collaborator.id
+    if project_id and email: 
+        for collaborator_list_page in api.get_collaborators(project_id):
+            for collaborator in collaborator_list_page:
+                if collaborator.email == email:
+                    return collaborator.id
     return None
 
 def transfer_list(keep_list_name: str, todoist_project: str, due: str, sync_labels: bool, assignee_email: str):
@@ -231,7 +215,7 @@ if __name__ == '__main__':
     configManager = ConfigManager('config.schema.yaml', 'config.yaml')
 
     keep = gkeepapi.Keep()
-    google_login(keep, configManager.config['google_username'], configManager.config['google_password'], device_id='3ee9002270d00157')
+    google_login(keep, configManager.config['google_username'], configManager.config['google_token'])
 
     todoist_api = TodoistAPI(configManager.config['todoist_api_token'])
 

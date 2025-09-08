@@ -4,4 +4,4 @@ todoist-api-python==3.1.0
 pyyaml==6.0.2
 yamale==6.0.0
 schedule==1.2.2
-pytest==8.4.1
+pytest==8.4.2

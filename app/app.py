@@ -172,22 +172,23 @@ def transfer_untitled_notes(add_label: str, due: str):
         labels = [add_label]
         todoist_labels = create_todoist_labels_if_necessary(labels, todoist_api)
     for untitled_note in keep.find(func=lambda x: x.title == ''):
-        log.info(f'transfering untitled note from keep to todoist:')
-        task_added = None
-        try:
-            task_added = todoist_api.add_task(content=untitled_note.text, due_string=due, due_lang='en', labels=todoist_labels)
-        except Exception as ex:
-            sync_errors.record_error('untitled', untitled_note, ex)
-        
-        if task_added:
+        if untitled_note.text:
+            log.info(f'transfering untitled note from keep to todoist:')
+            task_added = None
             try:
-                untitled_note.trash()
+                task_added = todoist_api.add_task(content=untitled_note.text, due_string=due, due_lang='en', labels=todoist_labels)
             except Exception as ex:
                 sync_errors.record_error('untitled', untitled_note, ex)
-                todoist_api.delete_task(task_added.id)
-        
-        sync_errors.successful_sync('untitled', untitled_note)
-        log.info(f'\t-> {untitled_note.text}')
+            
+            if task_added:
+                try:
+                    untitled_note.trash()
+                except Exception as ex:
+                    sync_errors.record_error('untitled', untitled_note, ex)
+                    todoist_api.delete_task(task_added.id)
+            
+            sync_errors.successful_sync('untitled', untitled_note)
+            log.info(f'\t-> {untitled_note.text}')
     keep.sync()
 
 def update():

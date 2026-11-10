@@ -1,4 +1,4 @@
-gpsoauth==2.0.0
+gpsoauth==3.0.0
 gkeepapi==0.17.1
 todoist-api-python==4.0.1
 pyyaml==6.0.3

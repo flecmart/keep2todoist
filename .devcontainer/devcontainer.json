@@ -3,11 +3,11 @@
 {
 	"name": "Debian",
 	// Or use a Dockerfile or Docker Compose file. More info: https://containers.dev/guide/dockerfile
-	"image": "mcr.microsoft.com/devcontainers/base:bullseye",
+	"image": "mcr.microsoft.com/devcontainers/base:trixie",
 	"features": {
 		"ghcr.io/devcontainers/features/python:1": {
 			"installTools": true,
-			"version": "3.13"
+			"version": "3.14"
 		}
 	},
 

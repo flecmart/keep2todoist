@@ -5,3 +5,4 @@ pyyaml==6.0.3
 yamale==6.1.0
 schedule==1.2.2
 pytest==9.2.0
+certifi>=2026.10.19

@@ -38,4 +38,13 @@ def test_healthy_after_errors_resolved():
     
     tracker.successful_sync(list_name, list_item)
     assert tracker.healthy == True
-  
+
+def test_no_collision_between_similar_names():
+    tracker = SyncErrorTracker(unhealthy_after=2)
+    tracker.record_error('a_b', 'c', exception)
+    tracker.record_error('a', 'b_c', exception)
+    assert tracker.healthy == True
+
+    tracker.successful_sync('a_b', 'c')
+    tracker.record_error('a', 'b_c', exception)
+    assert tracker.healthy == False

@@ -1,0 +1,11 @@
+# Keep local credentials out of the image; config.yaml is bind-mounted at runtime
+config.yaml
+config.*.yaml
+!config.schema.yaml
+!config.example.yaml
+gkeepapi_token
+
+# Not needed at runtime
+__pycache__/
+*.py[cod]
+.pytest_cache/

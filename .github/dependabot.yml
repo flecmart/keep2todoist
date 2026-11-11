@@ -9,6 +9,10 @@ updates:
     directory: "/" # Location of package manifests
     schedule:
       interval: "weekly"
+    groups:
+      pip-minor-patch:
+        update-types: ["minor", "patch"]
+        exclude-patterns: ["gkeepapi", "gpsoauth"]
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:

@@ -21,8 +21,8 @@ class SyncErrorTracker():
         """
         return self._healthy
         
-    def _get_error_key(self, keep_list_name: str, item_name: str) -> str:
-        return f'{keep_list_name}_{item_name}'
+    def _get_error_key(self, keep_list_name: str, item_name: str) -> tuple[str, str]:
+        return (keep_list_name, item_name)
         
     def record_error(self, keep_list_name: str, item_name: str, exception: Exception):
         """Record sync error

@@ -9,9 +9,8 @@ on:
       - 'main'
   workflow_dispatch:
       
-# permissions are needed if pushing to ghcr.io
-permissions: 
-  packages: write
+permissions:
+  contents: read
 
 jobs:
 
@@ -31,6 +30,11 @@ jobs:
     needs: test
     
     runs-on: ubuntu-latest
+
+    # packages: write is needed for pushing to ghcr.io
+    permissions:
+      contents: read
+      packages: write
     
     steps:
       - name: Checkout
